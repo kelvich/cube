@@ -1,10 +1,6 @@
-/* contrib/cube/cube.sql.in */
-
--- Adjust this setting to control where the objects get created.
-SET search_path = public;
+/* contrib/cube/cube--1.0.sql */
 
 -- Create the user-defined type for N-dimensional boxes
---
 
 CREATE OR REPLACE FUNCTION cube_in(cstring)
 RETURNS cube
