@@ -1,4 +1,4 @@
-/* contrib/cube/cube--1.2.sql */
+/* contrib/cube/cube--1.3.sql */
 
 -- complain if script is sourced in psql, rather than via CREATE EXTENSION
 \echo Use "CREATE EXTENSION cube" to load this file. \quit
@@ -36,6 +36,10 @@ CREATE TYPE cube (
 );
 
 COMMENT ON TYPE cube IS 'multi-dimensional cube ''(FLOAT-1, FLOAT-2, ..., FLOAT-N), (FLOAT-1, FLOAT-2, ..., FLOAT-N)''';
+
+CREATE CAST (cube AS float8[])
+WITH FUNCTION cube_to_array(cube)
+AS ASSIGNMENT;
 
 --
 -- External C-functions for R-tree methods
