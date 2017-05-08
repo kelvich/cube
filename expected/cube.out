@@ -482,7 +482,7 @@ SELECT '(0)'::text::cube;
 (1 row)
 
 --
--- Test the float[] -> cube cast
+-- Test the float[] <-> cube cast
 --
 SELECT cube('{0,1,2}'::float[], '{3,4,5}'::float[]);
         cube         
@@ -502,6 +502,24 @@ SELECT cube('{0,1,2}'::float[]);
    cube    
 -----------
  (0, 1, 2)
+(1 row)
+
+SELECT cube_to_array('(1,2,3,4,5),(6,7,8,9,10)'::cube);
+       cube_to_array        
+----------------------------
+ {{1,2,3,4,5},{6,7,8,9,10}}
+(1 row)
+
+SELECT cube_to_array('(1,2,3,4,5)'::cube);
+ cube_to_array 
+---------------
+ {{1,2,3,4,5}}
+(1 row)
+
+SELECT cube_to_array('()'::cube);
+ cube_to_array 
+---------------
+ {}
 (1 row)
 
 SELECT cube_subset(cube('(1,3,5),(6,7,8)'), ARRAY[3,2,1,1]);

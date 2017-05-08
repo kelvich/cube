@@ -15,6 +15,7 @@
 #include "access/stratnum.h"
 #include "utils/array.h"
 #include "utils/builtins.h"
+#include "catalog/pg_type.h"
 
 #include "cubedata.h"
 
@@ -33,6 +34,7 @@ PG_FUNCTION_INFO_V1(cube_in);
 PG_FUNCTION_INFO_V1(cube_a_f8_f8);
 PG_FUNCTION_INFO_V1(cube_a_f8);
 PG_FUNCTION_INFO_V1(cube_out);
+PG_FUNCTION_INFO_V1(cube_to_array);
 PG_FUNCTION_INFO_V1(cube_f8);
 PG_FUNCTION_INFO_V1(cube_f8_f8);
 PG_FUNCTION_INFO_V1(cube_c_f8);
@@ -264,6 +266,41 @@ cube_subset(PG_FUNCTION_ARGS)
 
 	PG_FREE_IF_COPY(c, 0);
 	PG_RETURN_NDBOX(result);
+}
+
+/* Convert cube to multi-dim array */
+Datum
+cube_to_array(PG_FUNCTION_ARGS)
+{
+	NDBOX	   *cube = PG_GETARG_NDBOX(0);
+	int			cube_dim = DIM(cube);
+	int			array_dims[2];
+	int			array_lbs[2];
+	Datum	   *elems;
+	ArrayType  *array;
+	int			i;
+
+	array_dims[0] = IS_POINT(cube) ? 1 : 2;;
+	array_dims[1] = cube_dim;
+
+	array_lbs[0] = array_lbs[1] = 1;
+
+	elems = palloc(sizeof(*elems) * array_dims[0] * array_dims[1]);
+
+	for (i = 0; i < cube_dim; i++)
+		elems[i] = Float8GetDatum(LL_COORD(cube, i));
+
+	if (!IS_POINT(cube))
+	{
+		for (i = 0; i < cube_dim; i++)
+			elems[cube_dim + i] = Float8GetDatum(UR_COORD(cube, i));
+	}
+
+	array = construct_md_array(elems, NULL, 2, array_dims, array_lbs,
+								FLOAT8OID, 8, FLOAT8PASSBYVAL, 'd');
+
+	PG_FREE_IF_COPY(cube, 0);
+	PG_RETURN_POINTER(array);
 }
 
 Datum

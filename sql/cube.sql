@@ -115,12 +115,15 @@ SELECT cube(cube(cube(1,2),3,4),5,6);
 SELECT '(0)'::text::cube;
 
 --
--- Test the float[] -> cube cast
+-- Test the float[] <-> cube cast
 --
 SELECT cube('{0,1,2}'::float[], '{3,4,5}'::float[]);
 SELECT cube('{0,1,2}'::float[], '{3}'::float[]);
 SELECT cube(NULL::float[], '{3}'::float[]);
 SELECT cube('{0,1,2}'::float[]);
+SELECT cube_to_array('(1,2,3,4,5),(6,7,8,9,10)'::cube);
+SELECT cube_to_array('(1,2,3,4,5)'::cube);
+SELECT cube_to_array('()'::cube);
 SELECT cube_subset(cube('(1,3,5),(6,7,8)'), ARRAY[3,2,1,1]);
 SELECT cube_subset(cube('(1,3,5),(1,3,5)'), ARRAY[3,2,1,1]);
 SELECT cube_subset(cube('(1,3,5),(6,7,8)'), ARRAY[4,0]);
